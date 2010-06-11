@@ -250,11 +250,9 @@ class IOLoop(object):
                         # Happens when the client closes the connection
                         pass
                     else:
-                        logging.error("Exception in I/O handler for fd %d",
-                                      fd, exc_info=True)
+                        self.handle_fd_handler_exception(fd)
                 except:
-                    logging.error("Exception in I/O handler for fd %d",
-                                  fd, exc_info=True)
+                    self.handle_fd_handler_exception(fd)
         # reset the stopped flag so another start/stop pair can be issued
         self._stopped = False
         if self._blocking_log_threshold is not None:
@@ -324,6 +322,12 @@ class IOLoop(object):
         in sys.exc_info.
         """
         logging.error("Exception in callback %r", callback, exc_info=True)
+
+    def handle_fd_handler_exception(self, fd):
+        """Serves the same purpose as handle_callback_exception, but for
+        error raised while running a file descriptor handler.
+        """
+        logging.error("Exception in I/O handler for fd %d", fd, exc_info=True)
 
     def _read_waker(self, fd, events):
         try:
